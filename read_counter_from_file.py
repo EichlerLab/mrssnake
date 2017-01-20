@@ -10,6 +10,7 @@ from __future__ import print_function
 from __future__ import division
 
 import sys
+import gzip
 import argparse
 
 from functools import total_ordering
@@ -38,7 +39,7 @@ def create_array(contigs, contigs_file, max_edist):
 
     for contig in contigs:
         contig_length = contig_dat.ix[contig_dat.contig == contig, "length"]
-        matrix_dict[contig] = np.ndarray((contig_length, max_edist+1), dtype=np.uint32)
+        matrix_dict[contig] = np.ndarray((int(contig_length), int(max_edist+1)), dtype=np.uint16)
 
 def add_to_array(array, pos, edist, rlen=36):
     """Add read entry to contig. Assumes pos is 0-based.
@@ -54,7 +55,7 @@ def process_file(infile, contigs, max_edist, rlen=36, mode="tab"):
     else:
         regex_full = re.compile("[^ @\t]+\t[0-9]+\t(%s)\t([0-9]+)\t.+NM:i:([0-9]+)" % contigs_string)
     nhits = {contig: 0 for contig in contigs}
-    with open(infile, "r") as handle:
+    with gzip.open(infile, "rt") as handle:
         for line in handle:
             match = regex_full.match(line)
             if match is not None:
@@ -93,7 +94,7 @@ def write_to_h5(contig, depth_contig, fout_handle, chunksize=1000000):
         contig_len, edists = matrix_dict[contig].shape
         carray_empty = tables.CArray(group,
                                      contig,
-                                     tables.UInt32Atom(),
+                                     tables.UInt16Atom(),
                                      (contig_len, edists, 2),
                                      filters=tables.Filters(complevel=1, complib="lzo")
                                     )
@@ -152,7 +153,7 @@ if __name__ == "__main__":
     
     with tables.open_file(args.outfile, mode="w") as h5file:
         for contig in args.contigs:
-            depth_contig = np.zeros(shape=matrix_dict[contig].shape, dtype=np.uint32)
+            depth_contig = np.zeros(shape=matrix_dict[contig].shape, dtype=np.uint16)
             create_depth_array.create_depth_array(matrix_dict[contig], depth_contig)
             write_to_h5(contig, depth_contig, h5file)
             del matrix_dict[contig]

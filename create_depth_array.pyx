@@ -2,14 +2,14 @@ import numpy as np
 cimport numpy as np
 cimport cython
 
-DTYPE = np.uint32
+DTYPE = np.uint16
 
-ctypedef np.uint32_t DTYPE_t
+ctypedef np.uint16_t DTYPE_t
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 
-def create_depth_array(unsigned int [:, :] count, unsigned int [:, :] depth, unsigned int rlen=36):
+def create_depth_array(unsigned short [:, :] count, unsigned short [:, :] depth, unsigned int rlen=36):
 
     for i in range(count.shape[0] - rlen):
         for j in range(count.shape[1]):
