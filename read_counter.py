@@ -122,7 +122,7 @@ def write_to_h5(contig, array, fout_handle):
 
         carray_empty = tables.CArray(group,
                                      contig,
-                                     tables.UInt32Atom(),
+                                     tables.UInt16Atom(),
                                      (ncols, nedists, 2),
                                      filters=tables.Filters(complevel=1, complib="lzo")
                                     )
