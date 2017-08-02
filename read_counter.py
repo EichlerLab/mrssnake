@@ -420,7 +420,8 @@ if __name__ == "__main__":
     for contig, array in read_dict.items():
         if not isinstance(array, csr_matrix):
             read_dict[contig] = csr_matrix(array)
-            del array
+            if array is not None:
+                del array
 
     print("Counter: finished converting numpy arrays to lil matrices",
           file=logfile, flush=True)
@@ -431,7 +432,8 @@ if __name__ == "__main__":
         for i, (contig, array) in enumerate(read_dict.items()):
             print("Counter: %d: Creating array for %s" % (i, contig), file=sys.stdout, flush=True)
             store_sparse_matrix(array, contig, h5file)
-            del array
+            if array is not None:
+                del array
 
     run_end = time.time()
     total_runtime = run_end - run_start
