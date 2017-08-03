@@ -15,7 +15,7 @@ import tables
 #import numpy as np
 from scipy.sparse import csr_matrix
 
-def merge_contigs_to_wssd(infile_list, fout_handle):
+def merge_contigs_to_wssd(infile_list, fout_handle, ignore_missing=False):
     """
         Create a wssd_out_file by copying nodes from a list of single contig
         wssd files.
@@ -27,8 +27,11 @@ def merge_contigs_to_wssd(infile_list, fout_handle):
         with tables.open_file(file, mode="r") as h5_handle:
             nodes = [node for node in h5_handle.list_nodes("/depthAndStarts_wssd")]
             if len(nodes) == 0:
-                print("Error: no contigs in infile: %s" % (file), file=sys.stderr)
-                sys.exit(1)
+                print("No contigs in infile: %s" % (file), file=sys.stderr)
+                if ignore_missing:
+                    continue
+                else:
+                    sys.exit(1)
             if len(nodes) > 1:
                 print("Error: more than one contig (%d contigs) in infile: %s" % (len(nodes), file), file=sys.stderr)
                 sys.exit(1)
@@ -181,7 +184,7 @@ if __name__ == "__main__":
 
     if args.wssd_merge:
         with tables.open_file(args.outfile, mode="w") as fout:
-            merge_contigs_to_wssd(infiles, fout)
+            merge_contigs_to_wssd(infiles, fout, ignore_missing=args.ignore_empty_contigs)
     else:
         # Merge hdf5 files into single wssd_out_file
         with tables.open_file(args.outfile, mode="w") as fout:
