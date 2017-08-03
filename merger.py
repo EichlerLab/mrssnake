@@ -54,7 +54,7 @@ def load_sparse_matrix(name, root):
         mat = None
     return mat
 
-def merge_sparse_h5_to_wssd(infile_list, contig_list, fout_handle):
+def merge_sparse_h5_to_wssd(infile_list, contig_list, fout_handle, ignore_missing=False):
     """
         Create a wssd_out_file with depth and counts for each contig in contig list
         for each infile in infile_list. Assumes the h5 files contain sparse csr_matrices.
@@ -81,6 +81,10 @@ def merge_sparse_h5_to_wssd(infile_list, contig_list, fout_handle):
 
         if contig_array is None:
             print("Contig %s not found in infiles" % contig)
+            if ignore_missing:
+                return
+            else:
+                sys.exit(1)
         print("Writing contig %s to h5file" % (contig))
         nrows, ncols = contig_array.shape
         nedists = nrows // 2
@@ -140,6 +144,7 @@ if __name__ == "__main__":
                         help="Tab-delimited table with contig names in the first column")
     parser.add_argument("--contig", default=None, help="Name of contig to merge")
     parser.add_argument("--wssd_merge", action="store_true", help="Merge wssd contigs to wssd_out_file")
+    parser.add_argument("--ignore_empty_contigs", action="store_true", help="Ignore contigs missing from input (Default: %(default)s)")
 
     args = parser.parse_args()
 
@@ -180,7 +185,7 @@ if __name__ == "__main__":
     else:
         # Merge hdf5 files into single wssd_out_file
         with tables.open_file(args.outfile, mode="w") as fout:
-            merge_sparse_h5_to_wssd(infiles, contigs, fout)
+            merge_sparse_h5_to_wssd(infiles, contigs, fout, ignore_missing=args.ignore_empty_contigs)
 
     finish_time = time.time()
     print("Finished writing wssd_out_file in %d seconds. Closing." %
