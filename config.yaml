@@ -1,6 +1,7 @@
 ---
 reference: hg38
 manifest: manifest.txt
+mode: fast
 
 hg19_aws:
     masked_ref: /home/ec2-user/reference/hg19_masked
