@@ -37,6 +37,8 @@ def create_array(contigs, contigs_file, max_edist):
     global matrix_dict
     matrix_dict = {}
 
+    if contigs is None:
+        contigs = contig_dat.contig
     for contig in contigs:
         contig_length = contig_dat.ix[contig_dat.contig == contig, "length"]
         matrix_dict[contig] = np.ndarray((int(contig_length), int(max_edist+1)), dtype=np.uint16)
