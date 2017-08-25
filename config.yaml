@@ -1,7 +1,7 @@
 ---
 reference: hg38
 manifest: manifest.txt
-mode: fast
+mode: fast # Options: fast, full. Fast uses only the first 36 bp of each read, full uses all 36 bp chunks.
 
 hg19_aws:
     masked_ref: /home/ec2-user/reference/hg19_masked
