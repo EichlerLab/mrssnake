@@ -126,11 +126,11 @@ elif config["mode"] == "fast":
     rule fast_map:
         input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "bam"]
         output: "mapped/{sample}.raw.gz"
-        params: sge_opts="-l mfree=12G -pe serial 4 -l h_rt=20:00:00 -N map_{sample} -l disk_free=60G"
+        params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}"
         benchmark: "benchmarks/{sample}_mapping.txt"
         shell:
-            """rsync -arzv --bwlimit=20000 {input} $TMPDIR/{wildcards.sample}.bam
-               samtools fastq -F 0x100 -F 0x400 -F 0x800 $TMPDIR/{wildcards.sample}.bam | \
+            """pv -L 20K {input} |
+               samtools fastq -F 3840 - | \
                mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \
                        --disable-nohit --threads 4 --mem 8 | python mrsfast_outputconverter.py | \
                gzip > {output}"""
