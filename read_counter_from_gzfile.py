@@ -128,7 +128,7 @@ if __name__ == "__main__":
     parser.add_argument("--contigs_file", required=True,
                         help="tab-delimited file with contig names and lengths")
     parser.add_argument("--mode", choices=["tab", "sam"], default="tab",
-                        help="Input file format (Default: %(default)s)")
+                        help="Input file format (Default: %(default)s, tab must also be gzipped)")
     parser.add_argument("--max_edist",
                         default=2,
                         type=int,
