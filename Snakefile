@@ -5,6 +5,13 @@ from subprocess import CalledProcessError
 
 import pandas as pd
 
+try:
+    import create_depth_array
+except ImportError as e:
+    import pyximport
+    pyximport.install()
+    import create_depth_array
+
 SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 
 shell.executable("/bin/bash")
