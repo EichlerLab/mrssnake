@@ -129,10 +129,11 @@ elif config["mode"] == "fast":
         params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}"
         benchmark: "benchmarks/{sample}_mapping.txt"
         shell:
-            """pv -L 20K {input} |
+            """pv -L 20K {input.reads} |
                samtools fastq -F 3840 - | \
                mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \
-                       --disable-nohit --threads 4 --mem 8 | python mrsfast_outputconverter.py | \
+                       --disable-nohit --threads 4 --mem 8 | 
+               python mrsfast_outputconverter.py | \
                gzip > {output}"""
 else:
     raise ValueError("config['mode'] must be in ['fast', 'full'] but it is {}".format(config.get("mode", "not set")))
