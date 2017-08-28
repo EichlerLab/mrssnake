@@ -42,11 +42,14 @@ def create_array(contigs, contigs_file, max_edist):
     global matrix_dict
     matrix_dict = {}
 
+    all_contigs = contig_dat.contig
     if contigs is None:
-        contigs = contig_dat.contig
+        contigs = all_contigs
     for contig in contigs:
         contig_length = contig_dat.ix[contig_dat.contig == contig, "length"]
         matrix_dict[contig] = np.ndarray((int(contig_length), int(max_edist+1)), dtype=np.uint16)
+
+    return all_contigs
 
 def add_to_array(array, pos, edist, rlen=36):
     """Add read entry to contig. Assumes pos is 0-based.
@@ -124,7 +127,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("infile", help="Input file (sam or chr,pos,edist tab format)")
     parser.add_argument("outfile", help="HDF5 file with read depths and starts")
-    parser.add_argument("contigs", nargs="+", help="Names of contigs")
+    parser.add_argument("--contigs", nargs="+", help="Names of contigs")
     parser.add_argument("--contigs_file", required=True,
                         help="tab-delimited file with contig names and lengths")
     parser.add_argument("--mode", choices=["tab", "sam"], default="tab",
@@ -147,7 +150,10 @@ if __name__ == "__main__":
     else:
         logfile = sys.stderr
 
-    create_array(args.contigs, args.contigs_file, args.max_edist)
+    all_contigs = create_array(args.contigs, args.contigs_file, args.max_edist)
+
+    if args.contigs is None:
+        args.contigs = all_contigs
 
     nhits = process_file(args.infile, args.contigs, args.max_edist, args.mode)
 
