@@ -32,8 +32,8 @@ except ImportError as e:
 
 def create_array(contigs, contigs_file, max_edist):
     """Create global numpy array 'matrix' for given contig.
-    shape = (contig length, nedists, 2)
-    third dimension is for depth and starts, respectively.
+    shape = (contig length, 2)
+    second dimension is for edist 0 and edist > 0.
     """
 
     contig_dat = pd.read_table(contigs_file, header=None, names=["contig", "length"])
@@ -47,7 +47,7 @@ def create_array(contigs, contigs_file, max_edist):
         contigs = all_contigs
     for contig in contigs:
         contig_length = contig_dat.ix[contig_dat.contig == contig, "length"]
-        matrix_dict[contig] = np.ndarray((int(contig_length), int(max_edist+1)), dtype=np.uint16)
+        matrix_dict[contig] = np.ndarray((int(contig_length), 2), dtype=np.uint16)
 
     return all_contigs
 
@@ -56,6 +56,10 @@ def add_to_array(array, pos, edist, rlen=36):
     """
 
     end = pos + rlen
+
+    # Merge non-zero edists
+    if edist > 0:
+        edist = 1
     array[pos, edist] += 1
 
 def process_file(infile, contigs, max_edist, rlen=36, mode="tab"):
@@ -71,28 +75,13 @@ def process_file(infile, contigs, max_edist, rlen=36, mode="tab"):
             if match is not None:
                 contig, pos, edist = match.group(1,2,3)
                 pos = int(pos) - 1 # Convert 1-based pos to 0-based
-                edist = int(edist) 
+                edist = int(edist)
                 add_to_array(matrix_dict[contig], pos, edist, rlen=36)
                 nhits[contig] += 1
 
     return nhits
 
-def create_depth_contig(contig, read_len=36):
-    """Takes contig name and uses global matrix_dict to get read start matrix.
-    Uses that to create and return read depth matrix.
-    """
-    depth_count = np.zeros(shape=matrix_dict[contig].shape)
-
-    # Matrix is contig_length x nedists
-
-    for i in range(matrix_dict[contig].shape[0] - read_len):
-        for j in range(matrix_dict[contig].shape[1]):
-            if matrix_dict[contig][i, j] != 0:
-                depth_count[i:i+read_len, j] += matrix_dict[contig][i, j]
-
-    return depth_count
-
-def write_to_h5(contig, depth_contig, fout_handle, chunksize=1000000):
+def write_to_h5(contig, depth_contig, fout_handle, max_edist=2, chunksize=1000000):
     """Write counts (dictionary of contig matrices) to fout hdf5 file
     in increments of chunksize bases. Outfile is in wssd_out_file format.
     """
@@ -100,28 +89,32 @@ def write_to_h5(contig, depth_contig, fout_handle, chunksize=1000000):
         group = fout_handle.get_node(fout_handle.root, "depthAndStarts_wssd")
     except NoSuchNodeError:
         group = fout_handle.create_group(fout_handle.root, "depthAndStarts_wssd")
-    finally:
-        contig_len, edists = matrix_dict[contig].shape
-        carray_empty = tables.CArray(group,
-                                     contig,
-                                     tables.UInt16Atom(),
-                                     (contig_len, edists, 2),
-                                     filters=tables.Filters(complevel=1, complib="lzo")
-                                    )
 
-        nchunks = contig_len // chunksize
-        if nchunks * chunksize < contig_len:
-            nchunks += 1
+    contig_len = matrix_dict[contig].shape[0]
+    edists = max_edist+1
+    carray_empty = tables.CArray(group,
+                                 contig,
+                                 tables.UInt16Atom(),
+                                 (contig_len, edists, 2),
+                                 filters=tables.Filters(complevel=1, complib="lzo")
+                                )
 
-        for i in range(nchunks):
-            s = i * chunksize
-            e = s + chunksize
-            if e > contig_len:
-                e = contig_len
-            carray_empty[s:e, :, 0] = depth_contig[s:e, :]
-            carray_empty[s:e, :, 1] = matrix_dict[contig][s:e, :]
+    nchunks = contig_len // chunksize
+    if nchunks * chunksize < contig_len:
+        nchunks += 1
 
-        fout_handle.flush()
+    for i in range(nchunks):
+        s = i * chunksize
+        e = s + chunksize
+        if e > contig_len:
+            e = contig_len
+
+        # Edist 0-2 depths (merged)
+        carray_empty[s:e, 0, 0] = depth_contig[s:e]
+        # Edist 0 read starts (used for SUNKs)
+        carray_empty[s:e, 0, 1] = matrix_dict[contig][s:e, 0]
+
+    fout_handle.flush()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -166,8 +159,8 @@ if __name__ == "__main__":
     
     with tables.open_file(args.outfile, mode="w") as h5file:
         for contig in args.contigs:
-            depth_contig = np.zeros(shape=matrix_dict[contig].shape, dtype=np.uint16)
-            create_depth_array.create_depth_array(matrix_dict[contig], depth_contig)
+            depth_contig = np.zeros(shape=(matrix_dict[contig].shape[0]), dtype=np.uint16)
+            create_depth_array.create_depth_array_1row(matrix_dict[contig], depth_contig)
             write_to_h5(contig, depth_contig, h5file)
 
     run_end = time.time()
