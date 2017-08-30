@@ -6,11 +6,10 @@ import sys
 myFile=sys.stdin
 
 for line in myFile:
+    #Skip sam header
     if line.startswith("@"):
         continue
-    line = line.rstrip()
-    #skip sam header
-    var = line.split('\t')
+    var = line.rstrip().split("\t")
     try:
         #checks for correctly formatted line with edit distance in form of NM:i:0/1/2
         editdistance = var[11].split(':')
