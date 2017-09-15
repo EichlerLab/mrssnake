@@ -16,3 +16,11 @@ def create_depth_array(unsigned short [:, :] count, unsigned short [:, :] depth,
             if count[i, j] != 0:
                 for k in range(rlen):
                     depth[i+k, j] += count[i, j]
+
+def create_depth_array_1row(unsigned short [:, :] count, unsigned short [:] depth, unsigned int rlen=36):
+    cdef unsigned int i, j, k
+    for i in range(count.shape[0] - rlen):
+        for j in range(count.shape[1]):
+            if count[i, j] != 0:
+                for k in range(rlen):
+                    depth[i+k] += count[i, j]
