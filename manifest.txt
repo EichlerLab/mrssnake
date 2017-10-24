@@ -1,12 +1,12 @@
-sn	source	bam	index
-HG00512	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00512.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00512.bam.bai
-HG00513	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00513.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00513.bam.bai
-HG00514	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00514.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00514.bam.bai
-HG00731	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00731.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00731.bam.bai
-HG00732	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00732.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00732.bam.bai
-HG00733	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00733.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00733.bam.bai
-NA19238	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19238.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19238.bam.bai
-NA19239	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19239.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19239.bam.bai
-NA19240	local	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19240.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19240.bam.bai
+sn	path	index
+HG00512	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00512.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00512.bam.bai
+HG00513	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00513.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00513.bam.bai
+HG00514	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00514.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00514.bam.bai
+HG00731	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00731.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00731.bam.bai
+HG00732	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00732.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00732.bam.bai
+HG00733	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00733.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/HG00733.bam.bai
+NA19238	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19238.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19238.bam.bai
+NA19239	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19239.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19239.bam.bai
+NA19240	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19240.bam	/net/eichler/vol24/projects/structural_variation/nobackups/bams/final/NA19240.bam.bai
 
 

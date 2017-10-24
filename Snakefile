@@ -88,7 +88,7 @@ if config["mode"] == "full":
             shell("rsync {tempfile} {output}")
 
     rule map_and_count:
-        input: bam = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "bam"], index = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "index"]
+        input: bam = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"], index = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "index"]
         output: temp("region_matrices/{sample}/{sample}.{part}_%d.h5" % (BAM_PARTITIONS))
         params: sge_opts = "-l mfree=10G -N map_count -l h_rt=10:00:00 -soft -l gpfsstate=0"
         benchmark: "benchmarks/counter/{sample}/{sample}.{part}.%d.txt" % BAM_PARTITIONS
@@ -124,7 +124,7 @@ elif config["mode"] == "fast":
             """python3 read_counter_from_gzfile.py {input} {output} --contigs_file {CONTIGS_FILE}"""
 
     rule fast_map:
-        input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "bam"]
+        input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"]
         output: "mapped/{sample}.raw.gz"
         params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}"
         benchmark: "benchmarks/{sample}_mapping.txt"
@@ -139,7 +139,7 @@ else:
     raise ValueError("config['mode'] must be in ['fast', 'full'] but it is {}".format(config.get("mode", "not set")))
 
 rule check_bam_files:
-    input: [bam for bam in SAMPLES.bam]
+    input: [bam for bam in SAMPLES.path]
     output: touch("BAMS_READABLE")
     params: sge_opts = "-l h_rt=1:0:0"
     priority: 50
