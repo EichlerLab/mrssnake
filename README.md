@@ -11,9 +11,9 @@ Simple mrsfast read depth mapping using snakemake
    ```
 2. Create a tab-delimited manifest file with the appropriate header and a line for each sample
 
-   | sn | path | index |
-   | --- | ------ | --- | ----- |
-   | sample_name  | /full/path/to/reads | /full/path/to/reads_index |
+    sn  | path | index 
+    --- | ---- | ----- 
+    sample_name  | /full/path/to/reads | /full/path/to/reads_index 
 
 3. Modify `config.yaml`
 
