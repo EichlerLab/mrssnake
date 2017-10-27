@@ -16,4 +16,8 @@ for line in myFile:
         if editdistance[0].startswith("NM"):
             print(var[2] + '\t' + str(int(var[3])) + '\t' + editdistance[2])
     except IndexError as e:
-        print("IndexError:", e, file=sys.stderr)
+        if line.startswith("ERR:"):
+            print("Mrsfast", line, file=sys.stderr)
+            sys.exit(1)
+        else:
+            print("IndexError:", e, file=sys.stderr)

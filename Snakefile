@@ -130,7 +130,9 @@ elif config["mode"] == "fast":
         benchmark: "benchmarks/{sample}_mapping.txt"
         shell:
             """pv -L 20M {input.reads} -q |
-               samtools fastq -F 3840 - | \
+               samtools view -h - | \
+               awk '(length($10)>=36 || substr($1,1,1)=="@") {{print}}' | \
+               samtools fastq -nF 3840 - | \
                mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \
                        --disable-nohit --threads 4 --mem 8 | 
                python mrsfast_outputconverter.py | \
