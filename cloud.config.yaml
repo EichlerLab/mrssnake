@@ -1,0 +1,40 @@
+---
+reference: hg38_aws
+manifest: manifest.txt
+mode: fast # Options: fast, full. Fast uses only the first 36 bp of each read, full uses all 36 bp chunks.
+bucket: sscwgs-hg38/phase4
+
+hg38_aws:
+  masked_ref: /home/ec2-user/reference/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa
+  contigs: /home/ec2-user/reference/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa.fai
+
+hg19_aws:
+    masked_ref: /home/ec2-user/reference/hg19_masked
+    contigs: /home/ec2-user/reference/hg19_masked.fai
+hg19:
+    masked_ref: /net/eichler/vol2/eee_shared/assemblies/hg19/indexes/mrsfastULTRA/hg19_masked
+    contigs: /net/eichler/vol2/eee_shared/assemblies/hg19/indexes/mrsfastULTRA/hg19_masked.fai
+hg38:
+    masked_ref: /net/eichler/vol2/eee_shared/assemblies/hg38/indexes/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa
+    contigs: /net/eichler/vol2/eee_shared/assemblies/hg38/indexes/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa.fai
+custom_contig:
+    masked_ref: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/mask/fastas/FAM115C_LOC154761_final/FAM115C_LOC154761_final.rp.trf.mask.fasta
+    contigs: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/FAM115C_LOC154761_final_lengths.tab
+
+# Number of partitions for mapped reads. 500 works well for ~30-40X coverage on human genomes
+bam_partitions: 500 
+# Number of unmapped partitions. If set to -1, use bam_partitions / 100
+unmapped_partitions: -1 
+
+# Maximum allowed edit distance for mrsfastULTRA.
+max_edist: 2
+
+# Maximum bp to store in numpy arrays. The rest will be in scipy sparse lil matrices. 
+# Increase it to use more memory and decrease runtime. 
+# Decrease it to use less memory and increase runtime.
+max_bp_in_mem: 300000000
+
+# Set amazon to True if running on an EC2 instance
+rsync_bw_limit: 100000
+tmpdir: $TMPDIR
+clean_temp_files: False
