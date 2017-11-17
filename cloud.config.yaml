@@ -2,12 +2,12 @@
 reference: hg38_aws
 manifest: manifest.txt
 mode: fast # Options: fast, full. Fast uses only the first 36 bp of each read, full uses all 36 bp chunks.
-bucket: sscwgs-hg38/phase4
+download_bucket: sscwgs-hg38/phase4
+upload_bucket: sscwgs-hg38/mrssnake_test
 
 hg38_aws:
   masked_ref: /home/ec2-user/reference/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa
   contigs: /home/ec2-user/reference/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa.fai
-
 hg19_aws:
     masked_ref: /home/ec2-user/reference/hg19_masked
     contigs: /home/ec2-user/reference/hg19_masked.fai

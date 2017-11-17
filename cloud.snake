@@ -10,8 +10,7 @@ SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 shell.executable("/bin/bash")
 shell.prefix("set -euo pipefail; ")
 
-if config == {}:
-    configfile: "cloud.config.yaml"
+configfile: "cloud.config.yaml"
 
 MANIFEST = config["manifest"]
 REFERENCE = config["reference"]
@@ -33,8 +32,10 @@ with open(CONTIGS_FILE, "r") as reader:
         contig, size = line.rstrip().split()
         CONTIGS[contig] = int(size)
 
-SAMPLES = pd.read_table(MANIFEST)
-SAMPLES.index = SAMPLES.sn
+SAMPLES=[config["sample"]]
+
+#SAMPLES = pd.read_table(MANIFEST)
+#SAMPLES.index = SAMPLES.sn
 
 def get_sparse_matrices_from_sample(wildcards):
     return ["region_matrices/%s/%s.%d_%d" % (wildcards.sample, wildcards.sample, part, BAM_PARTITIONS) for part in range(BAM_PARTITIONS + UNMAPPED_PARTITIONS)]
@@ -42,7 +43,14 @@ def get_sparse_matrices_from_sample(wildcards):
 localrules: all, get_headers, make_jobfile, clean, make_chunker
 
 rule all:
-    input:  expand("mapping/{sample}/{sample}/wssd_out_file", sample = SAMPLES.sn)
+    input:  expand("uploaded/{sample}.txt", sample = SAMPLES)
+
+rule upload_file:
+    input: "mapping/{sample}/{sample}/wssd_out_file"
+    output: touch("uploaded/{sample}.txt")
+    params: upload_bucket=config["upload_bucket"]
+    benchmark: "benchmarks/upload.{sample}.txt"
+    shell: "aws s3 cp {input} s3://{params.upload_bucket}/{input}"
 
 rule clean:
     input: "mapping/{sample}/{sample}/wssd_out_file"
@@ -114,14 +122,15 @@ elif config["mode"] == "fast":
         input: "mapped/{sample}.raw.gz"
         output: "mapping/{sample}/{sample}/wssd_out_file"
         params: sge_opts="-l mfree=20G -l h_rt=24:00:00 -N map_{sample} -l disk_free=20G"
+        benchmark: "benchmarks/counting.{sample}.txt"
         shell:
             """python3 read_counter_from_gzfile.py {input} {output} --contigs_file {CONTIGS_FILE}"""
 
     rule fast_map:
-        input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"]
+        input: reads="data/{sample}.final.cram"
         output: "mapped/{sample}.raw.gz"
         params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}"
-        benchmark: "benchmarks/{sample}_mapping.txt"
+        benchmark: "benchmarks/mapping.{sample}.txt"
         shell:
             """pv -L 20M {input.reads} -q |
                samtools view -h - | \
@@ -135,7 +144,8 @@ else:
     raise ValueError("config['mode'] must be in ['fast', 'full'] but it is {}".format(config.get("mode", "not set")))
 
 rule download_file:
-    output: "data/{sample}.{type}"
-    params: bucket = config["bucket"]
+    output: "data/{sample}.final.cram"
+    params: download_bucket = config["download_bucket"]
+    benchmark: "benchmarks/download.{sample}.txt"
     shell:
-        "aws s3 cp --profile ssc s3://{params.bucket}/{wildcards.sample}.final.cram {output}"
+        "aws s3 cp --profile ssc s3://{params.download_bucket}/{wildcards.sample}.final.cram {output}"
