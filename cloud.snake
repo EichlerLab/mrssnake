@@ -129,10 +129,10 @@ elif config["mode"] == "fast":
     rule fast_map:
         input: reads="data/{sample}.final.cram"
         output: "mapped/{sample}.raw.gz"
-        params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}"
+        params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}", input_ref=config["input_ref"]
         benchmark: "benchmarks/mapping.{sample}.txt"
         shell:
-            """samtools view -h - | \
+            """samtools view -T {params.input_ref} -h {input.reads} | \
                awk '(length($10)>=36 || substr($1,1,1)=="@") {{print}}' | \
                samtools fastq -nF 3840 - | \
                mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \

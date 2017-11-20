@@ -5,6 +5,8 @@ mode: fast # Options: fast, full. Fast uses only the first 36 bp of each read, f
 download_bucket: sscwgs-hg38/phase4
 upload_bucket: sscwgs-hg38/mrssnake_test
 
+input_ref: /home/ec2-user/reference/human_hgsvg_v38/GRCh38_full_analysis_set_plus_decoy_hla.fa
+
 hg38_aws:
   masked_ref: /home/ec2-user/reference/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa
   contigs: /home/ec2-user/reference/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa.fai
