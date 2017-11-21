@@ -3,7 +3,8 @@ reference: hg38_aws
 manifest: manifest.txt
 mode: fast # Options: fast, full. Fast uses only the first 36 bp of each read, full uses all 36 bp chunks.
 download_bucket: sscwgs-hg38/phase4
-upload_bucket: sscwgs-hg38/mrssnake_test
+upload_bucket: simonsphase4/mrssnake_test
+log_table: SimonsRDProgress
 
 input_ref: /home/ec2-user/reference/human_hgsvg_v38/GRCh38_full_analysis_set_plus_decoy_hla.fa
 
