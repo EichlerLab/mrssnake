@@ -37,14 +37,13 @@ if __name__ == "__main__":
                 {
                     'AttributeName': 'SimonsID',
                     'AttributeType': 'S'
-                },
+                }
             ],
-
             KeySchema=[
                 {
                     'AttributeName': 'SimonsID',
                     'KeyType': 'HASH'
-                },
+                }
             ],
             ProvisionedThroughput={
                 'ReadCapacityUnits': 5,
