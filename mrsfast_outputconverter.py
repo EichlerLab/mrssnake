@@ -6,8 +6,8 @@ import sys
 myFile=sys.stdin
 
 for line in myFile:
-    #Skip sam header
-    if line.startswith("@"):
+    #Skip sam header and mrsfast logging
+    if line.startswith("@") or line.startswith("|") or line.startswith("-"):
         continue
     var = line.rstrip().split("\t")
     try:
@@ -19,5 +19,7 @@ for line in myFile:
         if line.startswith("ERR:"):
             print("Mrsfast", line, file=sys.stderr)
             sys.exit(1)
+        if line.startswith("Total"):
+            print(line, file=sys.stderr)
         else:
-            print("IndexError:", e, file=sys.stderr)
+            print("IndexError:", e, line, file=sys.stderr)
