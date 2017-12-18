@@ -23,12 +23,7 @@ import numpy as np
 import pandas as pd
 from tables import NoSuchNodeError
 
-try:
-    import create_depth_array
-except ImportError as e:
-    import pyximport
-    pyximport.install()
-    import create_depth_array
+import create_depth_array
 
 def create_array(contigs, contigs_file, max_edist):
     """Create global numpy array 'matrix' for given contig.

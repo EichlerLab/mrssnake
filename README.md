@@ -4,10 +4,12 @@
 Simple mrsfast read depth mapping using snakemake
 
 ## Quick start
-1. Clone the repository, set up the config file
+1. Clone the repository, set up the config file, compile the C extension
 
    ```bash
    git clone --recursive https://github.com/bnelsj/mrssnake
+   cd mrssnake
+   ./setup.sh
    ```
 2. Create a tab-delimited manifest file with the appropriate header and a line for each sample
 
@@ -35,7 +37,7 @@ Simple mrsfast read depth mapping using snakemake
    
 4. Run snakemake
 
-   This example will use 100 cores and the `--cluster-sync` option:
+   This example will use 100 cores with drmaa:
    ```bash
    snakemake --drmaa " -V -cwd -e ./log -o ./log {params.sge_opts} -w n -S /bin/bash" -w 30 -j 100 -kT
    ```
