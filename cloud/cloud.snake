@@ -13,7 +13,7 @@ SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 shell.executable("/bin/bash")
 shell.prefix("set -euo pipefail; ")
 
-configfile: "cloud.config.yaml"
+configfile: "%s/cloud.config.yaml" % SNAKEMAKE_DIR
 
 MANIFEST = config["manifest"]
 REFERENCE = config["reference"]
