@@ -11,7 +11,7 @@ import pandas as pd
 SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 
 shell.executable("/bin/bash")
-shell.prefix("set -euo pipefail; ")
+shell.prefix("set -euo pipefail; export PYTHONPATH=$PYTHONPATH:%s/../scripts; " % (SNAKEMAKE_DIR, SNAKEMAKE_DIR))
 
 configfile: "%s/cloud.config.yaml" % SNAKEMAKE_DIR
 
