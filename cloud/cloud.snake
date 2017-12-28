@@ -170,5 +170,5 @@ rule download_file:
         entry['InstanceID'] = INSTANCE_ID
         print(entry)
         table.put_item(Item=entry)
-        shell("aws s3 cp --profile ssc s3://{params.download_bucket}/{wildcards.sample}.final.cram {output}")
+        shell("aws s3 cp --quiet --profile ssc s3://{params.download_bucket}/{wildcards.sample}.final.cram {output}")
 
