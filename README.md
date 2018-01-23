@@ -8,8 +8,9 @@ Simple mrsfast read depth mapping using snakemake
 
    ```bash
    git clone --recursive https://github.com/bnelsj/mrssnake
-   cd mrssnake
+   cd mrssnake/scripts
    ./setup.sh
+   cd ..
    ```
 2. Create a tab-delimited manifest file with the appropriate header and a line for each sample
 
