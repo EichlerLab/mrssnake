@@ -8,7 +8,11 @@ import pandas as pd
 SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 
 shell.executable("/bin/bash")
-shell.prefix("source %s/env.cfg; set -euo pipefail; export PYTHONPATH=$PYTHONPATH:%s/../scripts; " % (SNAKEMAKE_DIR, SNAKEMAKE_DIR))
+if "PYTHONPATH" in os.environ:
+    pythonpath_string = "$PYTHONPATH:%s/../scripts" % SNAKEMAKE_DIR
+else:
+    pythonpath_string = "%s/../scripts" % SNAKEMAKE_DIR
+shell.prefix("source %s/env.cfg; set -euo pipefail; export PYTHONPATH=%s; " % (SNAKEMAKE_DIR, pythonpath_string))
 
 if config == {}:
     configfile: "config.yaml"
