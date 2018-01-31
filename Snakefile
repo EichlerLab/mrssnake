@@ -130,17 +130,17 @@ elif config["mode"] == "fast":
     rule fast_map:
         input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"]
         output: "mapped/{sample}.raw.gz"
-        params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}"
+        params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}",
+                fifo="$TMPDIR/{sample}.fifo"
         benchmark: "benchmarks/{sample}_mapping.txt"
         shell:
-            """pv -L 20M {input.reads} -q |
+            """mkfifo {params.fifo};
+               pv -L 20M {input.reads} -q |
                samtools view -h - | \
-               awk '(length($10)>=36 || substr($1,1,1)=="@") {{print}}' | \
-               samtools fastq -nF 3840 - | \
-               mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \
+               python scripts/sam_to_fastq.py /dev/stdin /dev/stdout --min_length 36 --offset 36 | \
+               mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o {params.fifo} \
                        --disable-nohit --threads 4 --mem 8 | 
-               python scripts/mrsfast_outputconverter.py | \
-               gzip > {output}"""
+               python scripts/mrsfast_outputconverter.py {params.fifo} {output} --compress"""
 else:
     raise ValueError("config['mode'] must be in ['fast', 'full'] but it is {}".format(config.get("mode", "not set")))
 
