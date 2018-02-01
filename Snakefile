@@ -130,7 +130,7 @@ elif config["mode"] == "fast":
     rule fast_map:
         input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"]
         output: "mapped/{sample}.raw.gz"
-        params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=20:00:00 -N map_{sample}",
+        params: sge_opts="-l mfree=4G -pe serial 4 -l h_rt=4:0:00:00 -N map_{sample}",
                 fifo="$TMPDIR/{sample}.fifo"
         benchmark: "benchmarks/{sample}_mapping.txt"
         shell:
