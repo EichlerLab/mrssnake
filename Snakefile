@@ -138,9 +138,9 @@ elif config["mode"] == "fast":
                pv -L 20M {input.reads} -q |
                samtools view -h - | \
                python scripts/sam_to_fastq.py /dev/stdin /dev/stdout --min_length 36 --offset 36 | \
-               mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o {params.fifo} \
+               mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \
                        --disable-nohit --threads 4 --mem 8 | 
-               python scripts/mrsfast_outputconverter.py {params.fifo} {output} --compress"""
+               python scripts/mrsfast_outputconverter.py /dev/stdin {output} --compress"""
 else:
     raise ValueError("config['mode'] must be in ['fast', 'full'] but it is {}".format(config.get("mode", "not set")))
 

@@ -33,9 +33,9 @@ if __name__ == "__main__":
                 editdistance = var[11].split(':')
                 if editdistance[0].startswith("NM"):
                     outstring = "{}\t{}\t{}\n".format(var[2], int(var[3]), int(editdistance[2]))
-                if args.compress:
-                    outstring = outstring.encode('ascii')
-                outfile.write(outstring)
+                    if args.compress:
+                        outstring = outstring.encode('ascii')
+                    outfile.write(outstring)
             except IndexError as e:
                 if line.startswith("ERR:"):
                     print("Mrsfast", line, file=sys.stderr)
@@ -44,3 +44,5 @@ if __name__ == "__main__":
                     print(line, file=sys.stderr)
                 else:
                     print("IndexError:", e, line, file=sys.stderr)
+            except ValueError as e:
+                print(line, file=sys.stderr)
