@@ -8,10 +8,7 @@ import pandas as pd
 SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 
 shell.executable("/bin/bash")
-if "PYTHONPATH" in os.environ:
-    pythonpath_string = "$PYTHONPATH:%s/../scripts" % SNAKEMAKE_DIR
-else:
-    pythonpath_string = "%s/../scripts" % SNAKEMAKE_DIR
+pythonpath_string = "%s/../scripts" % SNAKEMAKE_DIR
 shell.prefix("source %s/env.cfg; set -euo pipefail; export PYTHONPATH=%s; " % (SNAKEMAKE_DIR, pythonpath_string))
 
 if config == {}:
@@ -135,9 +132,9 @@ elif config["mode"] == "fast":
         benchmark: "benchmarks/{sample}_mapping.txt"
         shell:
             """mkfifo {params.fifo};
-               pv -L 20M {input.reads} -q |
+               pv -L 50M {input.reads} -q |
                samtools view -h - | \
-               python scripts/sam_to_fastq.py /dev/stdin /dev/stdout --min_length 36 --offset 36 | \
+               python scripts/sam_to_fastq.py /dev/stdin /dev/stdout --min_length 36 --offset 0 | \
                mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \
                        --disable-nohit --threads 4 --mem 8 | 
                python scripts/mrsfast_outputconverter.py /dev/stdin {output} --compress"""
