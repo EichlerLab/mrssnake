@@ -7,7 +7,7 @@ Simple mrsfast read depth mapping using snakemake
 1. Clone the repository, set up the config file, compile the C extension
 
    ```bash
-   git clone --recursive https://github.com/bnelsj/mrssnake
+   git clone --recursive https://github.com/eichlerlab/mrssnake
    cd mrssnake/scripts
    ./setup.sh
    cd ..
