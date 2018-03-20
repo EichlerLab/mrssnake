@@ -125,7 +125,7 @@ if __name__ == "__main__":
     else:
         logfile = sys.stderr
 
-    contigs = pd.read_table(args.contigs_file, header=None, names=["contigs", "size"])["contigs"].tolist()
+    contigs = pd.read_table(args.contigs_file, header=None, names=["contigs", "size"], usecols=[0, 1])["contigs"].tolist()
 
     l = multiprocessing.Lock()
     sh = open(args.samfile, mode="r")
