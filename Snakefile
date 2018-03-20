@@ -37,7 +37,7 @@ CONTIGS = {}
 
 with open(CONTIGS_FILE, "r") as reader:
     for line in reader:
-        contig, size = line.rstrip().split()
+        contig, size = line.rstrip().split()[0:2]
         CONTIGS[contig] = int(size)
 
 SAMPLES = pd.read_table(MANIFEST)
