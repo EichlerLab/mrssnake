@@ -104,7 +104,8 @@ if config["mode"] == "full":
             else:
                 local_index = input.index[0]
             mrsfast_ref_path = "/var/tmp/$USER/%s" % masked_ref_name
-            rsync_opts = """rsync {0}.index /var/tmp/$USER/ --bwlimit 10000 --copy-links -p;
+            rsync_opts = """mkdir -p /var/tmp/$USER; 
+                            rsync {0}.index /var/tmp/$USER/ --bwlimit 10000 --copy-links -p;
                             rsync {2} {3} --bwlimit 10000 --copy-links -p; 
                             if [[ ! -e {1} ]]; then touch {1}; fi; 
                             echo Finished rsync from {0} to {1} >> /dev/stderr; 
