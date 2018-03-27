@@ -154,7 +154,7 @@ def store_sparse_matrix(m, name, h5_handle, root="/depthAndStarts_wssd"):
 
         arr = np.array(getattr(m, par))
         atom = tables.Atom.from_dtype(arr.dtype)
-        ds = h5_handle.createCArray(root, full_name, atom, arr.shape)
+        ds = h5_handle.create_carray(root, full_name, atom, arr.shape)
         ds[:] = arr
     h5_handle.flush()
 
