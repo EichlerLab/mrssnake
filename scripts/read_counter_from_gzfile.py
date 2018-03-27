@@ -57,13 +57,14 @@ def add_to_array(array, pos, edist, rlen=36):
         edist = 1
     array[pos, edist] += 1
 
-def process_file(infile, contigs, max_edist, rlen=36, mode="tab"):
+def process_file(infile, contigs, max_edist, rlen=36, mode="tab", nhits=None):
     contigs_string = "|".join(contigs)
     if mode == "tab":
         regex_full = re.compile("^({})\t([0-9]+)\t([0-9]+)".format(contigs_string))
     else:
         regex_full = re.compile("[^ @\t]+\t[0-9]+\t(%s)\t([0-9]+)\t.+NM:i:([0-9]+)" % contigs_string)
-    nhits = {contig: 0 for contig in contigs}
+    if nhits is None:
+        nhits = {contig: 0 for contig in contigs}
     with gzip.open(infile, "rt") as handle:
         for line in handle:
             match = regex_full.match(line)
@@ -113,8 +114,8 @@ def write_to_h5(contig, depth_contig, fout_handle, max_edist=2, chunksize=100000
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("infile", help="Input file (sam or chr,pos,edist tab format)")
     parser.add_argument("outfile", help="HDF5 file with read depths and starts")
+    parser.add_argument("--infiles", nargs="+", required=True, help="Input files (sam or chr,pos,edist gzipped tab format)")
     parser.add_argument("--contigs", nargs="+", help="Names of contigs")
     parser.add_argument("--contigs_file", required=True,
                         help="tab-delimited file with contig names and lengths")
@@ -143,7 +144,9 @@ if __name__ == "__main__":
     if args.contigs is None:
         args.contigs = all_contigs
 
-    nhits = process_file(args.infile, args.contigs, args.max_edist, args.mode)
+    nhits = None
+    for fn in args.infiles:
+        nhits = process_file(fn, args.contigs, args.max_edist, args.mode, nhits=nhits)
 
     mp_end = time.time() - run_start
 

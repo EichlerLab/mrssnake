@@ -123,7 +123,7 @@ elif config["mode"] == "fast":
         output: "mapping/{sample}/{sample}/wssd_out_file"
         params: sge_opts="-l mfree=20G -l h_rt=24:00:00 -N map_{sample} -l disk_free=20G"
         shell:
-            """python3 scripts/read_counter_from_gzfile.py {input} {output} --contigs_file {CONTIGS_FILE}"""
+            """python3 scripts/read_counter_from_gzfile.py {output} --infiles {input} --contigs_file {CONTIGS_FILE}"""
 
     rule fast_map:
         input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"]
