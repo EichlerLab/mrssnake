@@ -91,7 +91,7 @@ if config["mode"] == "full":
     rule map_and_count:
         input: bam = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"], index = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "index"]
         output: temp("region_matrices/{sample}/{sample}.{part}_%d.h5" % (BAM_PARTITIONS))
-        params: sge_opts = "-l mfree=10G -N map_count -l h_rt=10:00:00 -soft -l gpfsstate=0"
+        params: sge_opts = "-l mfree=20G -N map_count -l h_rt=10:00:00 -soft -l gpfsstate=0"
         benchmark: "benchmarks/counter/{sample}/{sample}.{part}.%d.txt" % BAM_PARTITIONS
         resources: mem=10
         priority: 20
