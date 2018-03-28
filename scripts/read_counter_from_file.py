@@ -31,7 +31,7 @@ def create_array(contigs, contigs_file, max_edist):
     third dimension is for depth and starts, respectively.
     """
 
-    contig_dat = pd.read_table(contigs_file, header=None, names=["contig", "length"])
+    contig_dat = pd.read_table(contigs_file, header=None, names=["contig", "length"], usecols=[0,1])
     contig_dat.index = contig_dat.contig
 
     global matrix_dict
