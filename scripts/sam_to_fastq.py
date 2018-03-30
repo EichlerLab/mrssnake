@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("output")
     parser.add_argument("--min_length", type=int, default=36, help="Minimum length of reads to include (Default: %(default)s)")
     parser.add_argument("--offset", type=int, default=0, help="Bases to offset start of read (Default: %(default)s)")
-    parser.add_argument("--exclude_any", type=int, default=0, help="Exclude reads with any of these properties by bitwise AND")
+    parser.add_argument("--exclude_any", type=int, default=3840, help="Exclude reads with specified flags by bitwise AND")
 
     args = parser.parse_args()
 
