@@ -1,0 +1,35 @@
+---
+reference: hg38
+manifest: manifest.txt
+mode: full # Options: fast, full. Fast uses only the first 36 bp of each read, full uses all 36 bp chunks.
+input_format: cram
+
+aligned_reference: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/human_hgsvg_v38/GRCh38_full_analysis_set_plus_decoy_hla.fa
+
+hg19_aws:
+    masked_ref: /home/ec2-user/reference/hg19_masked
+    contigs: /home/ec2-user/reference/hg19_masked.fai
+hg19:
+    masked_ref: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/hg19/indexes/mrsfastULTRA/hg19_masked
+    contigs: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/hg19/indexes/mrsfastULTRA/hg19_masked.fai
+hg38:
+    masked_ref: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/hg38/indexes/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa
+    contigs: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/hg38/indexes/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa.fai
+custom_contig:
+    masked_ref: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/mask/fastas/FAM115C_
+LOC154761_final/FAM115C_LOC154761_final.rp.trf.mask.fasta
+    contigs: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/FAM115C_LOC154761_final
+_lengths.tab
+
+# Number of partitions for mapped reads. 100 works well for ~30-40X coverage on human genomes
+bam_partitions: 100
+# Number of unmapped partitions. If set to -1, use bam_partitions / 100
+unmapped_partitions: -1 
+
+# Maximum allowed edit distance for mrsfastULTRA.
+max_edist: 2
+
+# Set amazon to True if running on an EC2 instance
+rsync_bw_limit: 100000
+tmpdir: $TMPDIR
+clean_temp_files: False

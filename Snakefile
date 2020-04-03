@@ -12,13 +12,14 @@ pythonpath_string = "%s/../scripts" % SNAKEMAKE_DIR
 shell.prefix("source %s/env.cfg; set -euo pipefail; export PYTHONPATH=%s; " % (SNAKEMAKE_DIR, pythonpath_string))
 
 if config == {}:
-    configfile: "config.yaml"
+    configfile: "mrssfast_config.yaml"
 
 MANIFEST = config["manifest"]
 REFERENCE = config["reference"]
 MASKED_REF = config[REFERENCE]["masked_ref"]
 CONTIGS_FILE = config[REFERENCE]["contigs"]
-
+ALIGNED_REF = config["aligned_reference"]
+INPUT_TYPE = config["input_format"]
 BAM_PARTITIONS = config["bam_partitions"]
 UNMAPPED_PARTITIONS = config["unmapped_partitions"]
 if UNMAPPED_PARTITIONS == -1:
@@ -55,13 +56,15 @@ rule clean:
         if CLEAN_TEMP_FILES:
             shell("rm region_matrices/{wildcards.sample}/*")
 
-if config["mode"] == "full":
+if config["mode"] == "full" and INPUT_TYPE == 'bam':
     rule full_count:
         input: expand("mapped/{{sample}}/{{sample}}.{part}_%d.tab.gz" % (BAM_PARTITIONS), part=range(BAM_PARTITIONS + UNMAPPED_PARTITIONS))
         output: "mapping/{sample}/{sample}/wssd_out_file"
         params: sge_opts="-l mfree=20G -l h_rt=24:00:00 -N map_{sample} -l disk_free=20G"
         shell:
-            """python3 scripts/read_counter_from_gzfile.py {output} --infiles {input} --contigs_file {CONTIGS_FILE}"""
+            '''
+            python3 scripts/read_counter_from_gzfile.py {output} --infiles {input} --contigs_file {CONTIGS_FILE}
+            '''
 
     rule full_map:
         input: bam = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"], index = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "index"]
@@ -91,6 +94,54 @@ if config["mode"] == "full":
                 "mrsfast --search {mrsfast_ref_path} -n 0 -e {MAX_EDIST} --crop 36 --seq /dev/stdin -o {fifo} --disable-nohit >> /dev/stderr | "
                 "python3 scripts/mrsfast_outputconverter.py {fifo} {output} --compress"
                 )
+
+elif config["mode"] == "full" and INPUT_TYPE == 'cram':
+    rule full_count:
+        input: expand("mapped/{{sample}}/{{sample}}.{part}_%d.tab.gz" % (BAM_PARTITIONS), part=range(1, BAM_PARTITIONS + UNMAPPED_PARTITIONS))
+        output: "mapping/{sample}/{sample}/wssd_out_file"
+        priority: 40
+        params: 
+            sge_opts="-l mfree=20G -l h_rt=24:00:00 -N map_{sample}"
+        shell:
+            '''
+            python3 {SNAKEMAKE_DIR}/scripts/read_counter_from_gzfile.py {output} --infiles {input} --contigs_file {CONTIGS_FILE}
+            '''
+
+    rule full_map:
+        input: bam = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"], index = '{sample}_dump.txt'
+        output: tab = "mapped/{sample}/{sample}.{part}_%d.tab.gz" % (BAM_PARTITIONS)
+        params: sge_opts = "-pe serial 4 -l mfree=4G -N map_count -l h_rt=10:00:00 -l disk_free=2G"
+        benchmark: "benchmarks/counter/{sample}/{sample}.{part}.%d.txt" % BAM_PARTITIONS
+        resources: mem=10
+        priority: 20
+        log: "log/map/{sample}/{part}_%s.txt" % BAM_PARTITIONS
+        run:
+            fifo = "$TMPDIR/mrsfast_fifo"
+            if TMPDIR != "":
+                local_index = "%s/%s" % (TMPDIR, os.path.basename(input.index[0]))
+            else:
+                local_index = input.index[0]
+            shell("hostname; echo part: {wildcards.part} nparts: {BAM_PARTITIONS} unmapped parts: {UNMAPPED_PARTITIONS}; mkfifo {fifo}")
+            shell("""python {SNAKEMAKE_DIR}/scripts/cramChunker.py -c {input.bam} -i {input.index} -s {wildcards.part} -p {BAM_PARTITIONS} -o $TMPDIR/{wildcards.sample}.{wildcards.part}.cram; \
+                samtools index $TMPDIR/{wildcards.sample}.{wildcards.part}.cram;
+                samtools view -h -T {ALIGNED_REF} $TMPDIR/{wildcards.sample}.{wildcards.part}.cram | \
+                python {SNAKEMAKE_DIR}/scripts/cram_to_fasta.py -i /dev/stdin -c 36 -o /dev/stdout | \
+                mrsfast --search {MASKED_REF} -n 0 -e {MAX_EDIST} --crop 36 --seq /dev/stdin -o {fifo} --disable-nohit >> /dev/stderr | \
+                python3 {SNAKEMAKE_DIR}/scripts/mrsfast_outputconverter.py {fifo} {output.tab} --compress"""
+                )
+
+    rule full_index:
+        input: 
+            bam = lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"]
+        output: 
+            index = temp('{sample}_dump.txt')
+        params: sge_opts = "-pe serial 1 -l mfree=8G -N map_count -l h_rt=10:00:00"
+        priority: 20
+        shell:
+            '''
+            cram_dump {input.bam} | grep "Container pos" > {output.index}
+            '''
+
 
 elif config["mode"] == "fast":
     rule fast_count:
