@@ -14,13 +14,10 @@ Simple mrsfast read depth mapping using snakemake
    ```
 2. Create a tab-delimited manifest file with the appropriate header and a line for each sample
 
-For bam/cram input:
-
     sn  | path | index 
     --- | ---- | ----- 
     sample_name  | /full/path/to/reads | /full/path/to/reads_index 
 
-For cram input:
 
 3. Modify `mrssfast_config.yaml`
 
