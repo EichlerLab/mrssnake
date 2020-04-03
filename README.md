@@ -14,7 +14,7 @@ Simple mrsfast read depth mapping using snakemake
    ```
 2. Create a tab-delimited manifest file with the appropriate header and a line for each sample
 
-For bam input:
+For bam/cram input:
 
     sn  | path | index 
     --- | ---- | ----- 
