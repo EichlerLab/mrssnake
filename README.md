@@ -14,14 +14,18 @@ Simple mrsfast read depth mapping using snakemake
    ```
 2. Create a tab-delimited manifest file with the appropriate header and a line for each sample
 
+For bam input:
+
     sn  | path | index 
     --- | ---- | ----- 
     sample_name  | /full/path/to/reads | /full/path/to/reads_index 
 
-3. Modify `config.yaml`
+For cram input:
+
+3. Modify `mrssfast_config.yaml`
 
    In particular, set the manifest variable to point to your manifest file, 
-   make sure the `reference` variable points to the appropriate reference, 
+   make sure the `reference` and `aligned_reference` variables point to the appropriate reference, 
    and that the paths for the `masked_ref` and `contigs` for your reference are correct.
    
    To add a new reference `new_ref` to the config file, change `reference`:
@@ -40,6 +44,7 @@ Simple mrsfast read depth mapping using snakemake
 
    This example will use 100 cores with drmaa:
    ```bash
+   export DRMAA_LIBRARY_PATH=/opt/uge/lib/lx-amd64/libdrmaa.so.1.0
    snakemake --drmaa " -V -cwd -e ./log -o ./log {params.sge_opts} -w n -S /bin/bash" -w 30 -j 100 -kT
    ```
 
