@@ -12,7 +12,7 @@ pythonpath_string = "%s/../scripts" % SNAKEMAKE_DIR
 shell.prefix("source %s/env.cfg; set -euo pipefail; export PYTHONPATH=%s; " % (SNAKEMAKE_DIR, pythonpath_string))
 
 if config == {}:
-    configfile: "mrssfast_config.yaml"
+    configfile: "mrsfast_config.yaml"
 
 MANIFEST = config["manifest"]
 REFERENCE = config["reference"]

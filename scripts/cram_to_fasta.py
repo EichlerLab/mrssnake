@@ -2,6 +2,7 @@
 
 import pysam
 import argparse
+import sys
 
 parser = argparse.ArgumentParser()
 
@@ -14,13 +15,10 @@ args = parser.parse_args()
 samfile = pysam.AlignmentFile(args.input, mode="rc", check_sq=False)
 with open(args.output, 'w') as outFile:
 	for line in samfile.fetch():
-		try:
-			if ("H" not in str(line.cigarstring)) and ((line.flag & 0xc00) == 0) and (line.cigarstring != '\*'):
-				sequence = line.query_sequence
-				for i in range(0, len(sequence), args.chunk):
-					if i+args.chunk < len(sequence):
-						outFile.write(">0\n"+sequence[i:i+args.chunk]+'\n')
-			else:
-				continue
-		except:
+		if ("H" not in str(line.cigarstring)) and ((line.flag & 0xc00) == 0):
+			sequence = line.query_sequence
+			for i in range(0, len(sequence), args.chunk):
+				if i+args.chunk < len(sequence):
+					outFile.write(">0\n"+sequence[i:i+args.chunk]+'\n')
+		else:
 			continue
