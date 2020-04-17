@@ -149,7 +149,7 @@ elif config["mode"] == "fast":
         output: "mapping/{sample}/{sample}/wssd_out_file"
         params: sge_opts="-l mfree=20G -l h_rt=24:00:00 -N map_{sample} -l disk_free=20G"
         shell:
-            """python3 scripts/read_counter_from_gzfile.py {output} --infiles {input} --contigs_file {CONTIGS_FILE}"""
+            """python3 {SNAKEMAKE_DIR}/scripts/read_counter_from_gzfile.py {output} --infiles {input} --contigs_file {CONTIGS_FILE}"""
 
     rule fast_map:
         input: reads=lambda wildcards: SAMPLES.ix[SAMPLES.sn == wildcards.sample, "path"]
@@ -160,11 +160,11 @@ elif config["mode"] == "fast":
         shell:
             """mkfifo {params.fifo};
                pv -L 50M {input.reads} -q |
-               samtools view -h - | \
-               python scripts/sam_to_fastq.py /dev/stdin /dev/stdout --min_length 36 --offset 0 | \
+               samtools view -h -T {ALIGNED_REF} - | \
+               python {SNAKEMAKE_DIR}/scripts/sam_to_fastq.py /dev/stdin /dev/stdout --min_length 36 --offset 0 | \
                mrsfast --search {MASKED_REF} --crop 36 -n 0 -e 2 --seq /dev/stdin -o /dev/stdout \
                        --disable-nohit --threads 4 --mem 8 | 
-               python scripts/mrsfast_outputconverter.py /dev/stdin {output} --compress"""
+               python {SNAKEMAKE_DIR}/scripts/mrsfast_outputconverter.py /dev/stdin {output} --compress"""
 else:
     raise ValueError("config['mode'] must be in ['fast', 'full'] but it is {}".format(config.get("mode", "not set")))
 
