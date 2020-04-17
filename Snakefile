@@ -40,7 +40,7 @@ with open(CONTIGS_FILE, "r") as reader:
         contig, size = line.rstrip().split()[0:2]
         CONTIGS[contig] = int(size)
 
-SAMPLES = pd.read_table(MANIFEST)
+SAMPLES = pd.read_csv(MANIFEST, sep='\t')
 SAMPLES.index = SAMPLES.sn
 
 localrules: all, get_headers, make_jobfile, clean, make_chunker
