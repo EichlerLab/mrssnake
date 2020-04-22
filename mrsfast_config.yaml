@@ -1,8 +1,8 @@
 ---
 reference: hg38
 manifest: manifest.txt
-mode: full # Options: fast, full. Fast uses only the first 36 bp of each read, full uses all 36 bp chunks.
-input_format: cram
+mode: fast # Options: fast, full. Fast uses only the first 36 bp of each read, full uses all 36 bp chunks.
+input_format: bam
 
 aligned_reference: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/human_hgsvg_v38/GRCh38_full_analysis_set_plus_decoy_hla.fa
 
@@ -16,10 +16,8 @@ hg38:
     masked_ref: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/hg38/indexes/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa
     contigs: /net/eichler/vol26/eee_shared/nobackups/archive/assemblies/hg38/indexes/mrsfastULTRA/hg38.rmsk_and_trf.canonical.fa.fai
 custom_contig:
-    masked_ref: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/mask/fastas/FAM115C_
-LOC154761_final/FAM115C_LOC154761_final.rp.trf.mask.fasta
-    contigs: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/FAM115C_LOC154761_final
-_lengths.tab
+    masked_ref: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/mask/fastas/FAM115C_LOC154761_final/FAM115C_LOC154761_final.rp.trf.mask.fasta
+    contigs: /net/eichler/vol23/projects/human_diversity/nobackups/bnelsj/hsdg/FAM115C/rd_custom_contig_hgdp/FAM115C_LOC154761_final_lengths.tab
 
 # Number of partitions for mapped reads. 100 works well for ~30-40X coverage on human genomes
 bam_partitions: 100
