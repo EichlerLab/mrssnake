@@ -75,7 +75,21 @@ if config["mode"] == "full" and INPUT_TYPE == 'bam':
         priority: 20
         log: "log/map/{sample}/{part}_%s.txt" % BAM_PARTITIONS
         run:
-            shell("hostname; echo part: {wildcards.part} nparts: {BAM_PARTITIONS} unmapped parts: {UNMAPPED_PARTITIONS};")
+            masked_ref_name = os.path.basename(MASKED_REF)
+            fifo = "%s/mrsfast_fifo" % TMPDIR
+            if TMPDIR != "":
+                local_index = "%s/%s" % (TMPDIR, os.path.basename(input.index[0]))
+            else:
+                local_index = input.index[0]
+            mrsfast_ref_path = "/var/tmp/$USER/%s" % masked_ref_name
+            rsync_opts = """mkdir -p /var/tmp/$USER; 
+                            rsync {0}.index /var/tmp/$USER/ --bwlimit 10000 --copy-links -p;
+                            rsync {2} {3} --bwlimit 10000 --copy-links -p; 
+                            if [[ ! -e {1} ]]; then touch {1}; fi; 
+                            echo Finished rsync from {0} to {1} >> /dev/stderr; 
+                            echo Finished rsync from {2} to {3} >> /dev/stderr; """.format(MASKED_REF, mrsfast_ref_path, input.index[0], local_index)
+
+            shell("hostname; echo part: {wildcards.part} nparts: {BAM_PARTITIONS} unmapped parts: {UNMAPPED_PARTITIONS}; mkfifo {fifo}; {rsync_opts}")
             shell("{SNAKEMAKE_DIR}/bin/bam_chunker -b {input.bam} -p {wildcards.part} -n {BAM_PARTITIONS} -u {UNMAPPED_PARTITIONS} 2>> /dev/stderr | "
                 "mrsfast --search {mrsfast_ref_path} -n 0 -e {MAX_EDIST} --crop 36 --seq /dev/stdin -o {fifo} --disable-nohit >> /dev/stderr | "
                 "python3 {SNAKEMAKE_DIR}/scripts/mrsfast_outputconverter.py {fifo} {output} --compress"
