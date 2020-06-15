@@ -22,3 +22,4 @@ with open(args.output, 'w') as outFile:
 					outFile.write(">0\n"+sequence[i:i+args.chunk]+'\n')
 		else:
 			continue
+
