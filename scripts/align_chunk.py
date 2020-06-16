@@ -14,7 +14,7 @@ import pysam
 ## Intake arguments
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--cram", "-f", type=str, required=True, help="CRAM to be separated")
+parser.add_argument("--file", "-f", type=str, required=True, help="Alignment file to be separated")
 parser.add_argument("--index", "-i", type=str, required=True, help="Index along which the file will be split")
 parser.add_argument("--compression", "-c", type=str, required=True, help="Compression type [rc: cram, rb : bam]")
 parser.add_argument("--partitions", "-p", type=int, required=False, default=100, help="Number of partitions to split the file into")
@@ -50,8 +50,12 @@ end = sum(binDirectory[0:i]) + binDirectory[i]
 # Determines start partition
 start = sum(binDirectory[0:i])
 
-samfile = pysam.AlignmentFile(args.cram, mode=args.compression, reference_filename=args.ref)
-cram_chunk = pysam.AlignmentFile(args.output, "wc", template=samfile)
+if args.compression == 'rc':
+	samfile = pysam.AlignmentFile(args.file, mode=args.compression, reference_filename=args.ref)
+else:
+	samfile = pysam.AlignmentFile(args.file, mode=args.compression)
+
+cram_chunk = pysam.AlignmentFile(args.output, "wb", template=samfile)
 
 for i, read in enumerate(samfile.fetch()):
 	if i < start:

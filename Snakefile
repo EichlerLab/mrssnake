@@ -99,14 +99,14 @@ if config["mode"] == "full":
 			else:
 				local_index = input.index[0]
 			shell("hostname; echo part: {wildcards.part} nparts: {BAM_PARTITIONS} unmapped parts: {UNMAPPED_PARTITIONS}; mkfifo {fifo}")
-			shell("""python {SNAKEMAKE_DIR}/scripts/align_chunk.py -r {ALIGNED_REF} -f {input.bam} -i {input.index} -s {wildcards.part} -p {BAM_PARTITIONS} -c {COMPRESSION} -o $TMPDIR/{wildcards.sample}.{wildcards.part}.cram; \
-				samtools index $TMPDIR/{wildcards.sample}.{wildcards.part}.cram;
-				samtools view -h -T {ALIGNED_REF} $TMPDIR/{wildcards.sample}.{wildcards.part}.cram | \
-				python {SNAKEMAKE_DIR}/scripts/alignment_to_fasta.py -i /dev/stdin -c 36 -o /dev/stdout | \
-				mrsfast --threads {threads} --search {MASKED_REF} -n 0 -e {MAX_EDIST} --crop 36 --seq /dev/stdin -o {fifo} --disable-nohit >> /dev/stderr | \
-				python {SNAKEMAKE_DIR}/scripts/mrsfast_outputconverter.py {fifo} {output.tab} --compress"""
-				)
-
+			shell("""python {SNAKEMAKE_DIR}/scripts/align_chunk.py -r {ALIGNED_REF} -f {input.bam} -i {input.index} -s {wildcards.part} -p {BAM_PARTITIONS} -c {COMPRESSION} -o $TMPDIR/{wildcards.sample}.{wildcards.part}.bam;""")
+			shell("""
+					samtools index $TMPDIR/{wildcards.sample}.{wildcards.part}.bam;
+					samtools view -h $TMPDIR/{wildcards.sample}.{wildcards.part}.bam | \
+					python {SNAKEMAKE_DIR}/scripts/alignment_to_fasta.py -i /dev/stdin -c 36 -o /dev/stdout | \
+					mrsfast --threads {threads} --search {MASKED_REF} -n 0 -e {MAX_EDIST} --crop 36 --seq /dev/stdin -o {fifo} --disable-nohit >> /dev/stderr | \
+					python {SNAKEMAKE_DIR}/scripts/mrsfast_outputconverter.py {fifo} {output.tab} --compress"""
+					)
 
 	rule full_count:
 		input: expand("mapped/{{sample}}/{{sample}}.{part}_%d.tab.gz" % (BAM_PARTITIONS), part=range(1, BAM_PARTITIONS + UNMAPPED_PARTITIONS))
