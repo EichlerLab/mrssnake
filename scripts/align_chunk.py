@@ -57,7 +57,7 @@ else:
 
 cram_chunk = pysam.AlignmentFile(args.output, "wb", template=samfile)
 
-for i, read in enumerate(samfile.fetch()):
+for i, read in enumerate(samfile.fetch(until_eof=True)):
 	if i < start:
 		continue
 	elif i > end:
