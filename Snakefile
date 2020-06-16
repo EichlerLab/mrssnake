@@ -49,7 +49,7 @@ with open(CONTIGS_FILE, "r") as reader:
 SAMPLES = pd.read_csv(MANIFEST, sep='\t')
 SAMPLES.index = SAMPLES.sn
 
-localrules: all, get_headers, make_jobfile, clean, make_chunker
+localrules: all, clean, make_chunker
 
 rule all:
 	input:  expand("mapping/{sample}/{sample}/wssd_out_file", sample = SAMPLES.sn)
