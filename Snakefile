@@ -88,7 +88,7 @@ if config["mode"] == "full":
 			sge_opts = "-pe serial 4 -l mfree=4G -N map_count -l h_rt=10:00:00 -l disk_free=2G"
 		benchmark: "benchmarks/counter/{sample}/{sample}.{part}.%d.txt" % BAM_PARTITIONS
 		resources: 
-			mem=4
+			mem=8
 		threads: 4
 		priority: 20
 		log: "log/map/{sample}/{part}_%s.txt" % BAM_PARTITIONS
@@ -103,7 +103,7 @@ if config["mode"] == "full":
 			shell("""
 					samtools index $TMPDIR/{wildcards.sample}.{wildcards.part}.bam;
 					samtools view -h $TMPDIR/{wildcards.sample}.{wildcards.part}.bam | \
-					python {SNAKEMAKE_DIR}/scripts/alignment_to_fasta.py -i /dev/stdin -c 36 -o /dev/stdout | \
+					python {SNAKEMAKE_DIR}/scripts/alignment_to_fasta.py -p {COMPRESSION} -i /dev/stdin -c 36 -o /dev/stdout | \
 					mrsfast --threads {threads} --search {MASKED_REF} -n 0 -e {MAX_EDIST} --crop 36 --seq /dev/stdin -o {fifo} --disable-nohit >> /dev/stderr | \
 					python {SNAKEMAKE_DIR}/scripts/mrsfast_outputconverter.py {fifo} {output.tab} --compress"""
 					)
