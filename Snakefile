@@ -96,7 +96,7 @@ if config["mode"] == "full":
 				local_index = "%s/%s" % (TMPDIR, os.path.basename(input.index[0]))
 			else:
 				local_index = input.index[0]
-			shell("hostname; echo part: {wildcards.part} nparts: {BAM_PARTITIONS} unmapped parts: {UNMAPPED_PARTITIONS}; mkfifo {fifo}")
+			shell("hostname; echo part: {wildcards.part} nparts: {BAM_PARTITIONS}; mkfifo {fifo}")
 			shell("""python {SNAKEMAKE_DIR}/scripts/align_chunk.py -r {ALIGNED_REF} -f {input.bam} -i {input.index} -s {wildcards.part} -p {BAM_PARTITIONS} -c {COMPRESSION} -o $TMPDIR/{wildcards.sample}.{wildcards.part}.bam;""")
 			shell("""
 					samtools index $TMPDIR/{wildcards.sample}.{wildcards.part}.bam;
@@ -107,7 +107,7 @@ if config["mode"] == "full":
 					)
 
 	rule full_count:
-		input: expand("mapped/{{sample}}/{{sample}}.{part}_%d.tab.gz" % (BAM_PARTITIONS), part=range(1, BAM_PARTITIONS + UNMAPPED_PARTITIONS))
+		input: expand("mapped/{{sample}}/{{sample}}.{part}_%d.tab.gz" % (BAM_PARTITIONS), part=range(1, BAM_PARTITIONS + 1))
 		output: "mapping/{sample}/{sample}/wssd_out_file"
 		priority: 40
 		params: 
