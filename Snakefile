@@ -24,9 +24,7 @@ CONTIGS_FILE = config[REFERENCE]["contigs"]
 ALIGNED_REF = config["aligned_reference"]
 INPUT_TYPE = config["input_format"]
 BAM_PARTITIONS = config["bam_partitions"]
-UNMAPPED_PARTITIONS = config["unmapped_partitions"]
-if UNMAPPED_PARTITIONS == -1:
-	UNMAPPED_PARTITIONS = max(BAM_PARTITIONS // 100, 1)
+
 
 
 COMPRESSION = compress_dict[INPUT_TYPE]
