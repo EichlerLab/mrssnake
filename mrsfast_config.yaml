@@ -22,7 +22,6 @@ custom_contig:
 # Number of partitions for mapped reads. 100 works well for ~30-40X coverage on human genomes
 bam_partitions: 100
 # Number of unmapped partitions. If set to -1, use bam_partitions / 100
-unmapped_partitions: -1 
 
 # Maximum allowed edit distance for mrsfastULTRA.
 max_edist: 2
